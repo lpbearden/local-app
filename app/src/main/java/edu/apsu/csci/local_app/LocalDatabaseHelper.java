@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by lpbearden on 4/27/16.
  */
 public class LocalDatabaseHelper extends SQLiteOpenHelper {
+    private static LocalDatabaseHelper sInstance;
+
     // Database Info
     private static final String DATABASE_NAME = "localDatabase";
     private static final int DATABASE_VERSION = 1;
@@ -16,13 +18,11 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_LOCATIONS = "locations";
     private static final String TABLE_USERS = "users";
     private static final String TABLE_REVIEWS = "reviews";
-    private static final String TABLE_LOC_REVIEWS = "loc_reviews";
-    private static final String TABLE_USER_REVIEWS = "user_reviews";
     private static final String TABLE_LOC_IMGS = "loc_imgs";
     private static final String TABLE_USER_LIST = "user_list";
 
     // Location Table Columns
-    private static final String KEY_LOCATION_ID = "loc_id";
+    private static final String KEY_LOCATION_ID = "id";
     private static final String KEY_LOCATION_NAME = "name";
     private static final String KEY_LOCATION_DESC = "desc";
     private static final String KEY_LOCATION_TYPE = "type";
@@ -39,18 +39,13 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_PROFILE_PICTURE_URL = "profile_picture_url";
 
     // Review Table Columns
-    private static final String KEY_REVIEW_ID = "rev_id";
+    private static final String KEY_REVIEW_ID = "id";
     private static final String KEY_REVIEW_DATE = "date";
     private static final String KEY_REVIEW_RATING = "rating";
     private static final String KEY_REVIEW_TEXT = "review_text";
+    private static final String KEY_REVIEW_FK_LOC_ID = "loc_id";
+    private static final String KEY_REVIEW_FK_USERNAME = "username";
 
-    // Location_Reviews Table Columns
-    private static final String KEY_LOC_REVIEWS_LOC_ID = "loc_id";
-    private static final String KEY_LOC_REVIEWS_REV_ID = "rev_id";
-
-    // User_Reviews Table Columns
-    private static final String KEY_USER_REVIEWS_USERNAME = "username";
-    private static final String KEY_USER_REVIEWS_REV_ID = "rev_id";
 
     // Location_Images Table Columns
     private static final String KEY_LOC_IMGS_LOC_ID = "loc_id";
@@ -61,6 +56,12 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_LIST_LOC_ID = "loc_id";
 
 
+    public static synchronized LocalDatabaseHelper getsInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new LocalDatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
 
     public LocalDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -84,6 +85,7 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
                 KEY_LOCATION_NAME   + " TEXT," +
                 KEY_LOCATION_DESC   + " TEXT," +
                 KEY_LOCATION_TYPE   + " TEXT," +
+                KEY_LOCATION_STREET   + " TEXT," +
                 KEY_LOCATION_CITY   + " TEXT," +
                 KEY_LOCATION_STATE  + " TEXT," +
                 KEY_LOCATION_ZIP    + " INTEGER" +
@@ -95,50 +97,36 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
                 KEY_USER_FNAME                  + " TEXT," +
                 KEY_USER_LNAME                  + " TEXT," +
                 KEY_USER_PASSWORD               + " TEXT," +
-                KEY_USER_PROFILE_PICTURE_URL    + " TEXT" +
+                KEY_USER_PROFILE_PICTURE_URL    + " TEXT"  +
                 ")";
 
         String CREATE_REVIEWS_TABLE = "CREATE TABLE " + TABLE_REVIEWS +
                 "(" +
-                KEY_REVIEW_ID       + " INTEGER PRIMARY KEY," +
-                KEY_REVIEW_DATE     + " TEXT," +
-                KEY_REVIEW_RATING   + " INTEGER," +
-                KEY_REVIEW_TEXT     + " TEXT" +
-                ")";
-
-        String CREATE_LOC_REVIEWS_TABLE = "CREATE TABLE " + TABLE_LOC_REVIEWS +
-                "(" +
-                KEY_LOC_REVIEWS_LOC_ID + " INTEGER REFERENCES " + TABLE_LOCATIONS + "("+KEY_LOCATION_ID+")," +
-                KEY_LOC_REVIEWS_REV_ID + " INTEGER REFERENCES " + TABLE_REVIEWS + "("+KEY_REVIEW_ID+")," +
-                "primary key("+KEY_LOC_REVIEWS_LOC_ID+","+KEY_LOC_REVIEWS_REV_ID+")" +
-                ")";
-
-        String CREATE_USER_REVIEWS_TABLE = "CREATE TABLE " + TABLE_USER_REVIEWS +
-                "(" +
-                KEY_USER_REVIEWS_USERNAME + " TEXT REFERENCES " + TABLE_USERS + "("+KEY_USER_USERNAME+")," +
-                KEY_USER_REVIEWS_REV_ID + " INTEGER REFERENCES " + TABLE_REVIEWS + "("+KEY_REVIEW_ID+")," +
-                "primary key("+KEY_USER_REVIEWS_USERNAME+","+KEY_USER_REVIEWS_REV_ID+")" +
+                KEY_REVIEW_ID           + " INTEGER PRIMARY KEY," +
+                KEY_REVIEW_DATE         + " TEXT," +
+                KEY_REVIEW_RATING       + " INTEGER," +
+                KEY_REVIEW_TEXT         + " TEXT," +
+                KEY_REVIEW_FK_LOC_ID    + " INTEGER REFERENCES " + TABLE_LOCATIONS + "," +
+                KEY_REVIEW_FK_USERNAME  + " INTEGER REFERENCES " + TABLE_USERS +
                 ")";
 
         String CREATE_LOC_IMGS_TABLE = "CREATE TABLE " + TABLE_LOC_IMGS +
                 "(" +
-                KEY_LOC_IMGS_LOC_ID + " INTEGER REFERENCES " + TABLE_LOCATIONS + "("+KEY_LOCATION_ID+")," +
-                KEY_LOC_IMGS_IMG_PATH + " TEXT," +
+                KEY_LOC_IMGS_LOC_ID     + " INTEGER REFERENCES " + TABLE_LOCATIONS + "," +
+                KEY_LOC_IMGS_IMG_PATH   + " TEXT," +
                 "primary key("+KEY_LOC_IMGS_LOC_ID+","+KEY_LOC_IMGS_IMG_PATH+")" +
                 ")";
 
         String CREATE_USER_LIST_TABLE = "CREATE TABLE " + TABLE_USER_LIST +
                 "(" +
-                KEY_USER_LIST_USERNAME + " TEXT REFERENCES " + TABLE_LOCATIONS + "("+KEY_LOCATION_ID+")," +
-                KEY_USER_LIST_LOC_ID + " INTEGER REFERENCES " + TABLE_LOCATIONS + "("+KEY_LOCATION_ID+")," +
+                KEY_USER_LIST_USERNAME  + " TEXT REFERENCES "       + TABLE_USERS + "," +
+                KEY_USER_LIST_LOC_ID    + " INTEGER REFERENCES "    + TABLE_LOCATIONS + "," +
                 "primary key("+KEY_USER_LIST_USERNAME+","+KEY_USER_LIST_LOC_ID+")" +
                 ")";
 
         db.execSQL(CREATE_LOCATIONS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_REVIEWS_TABLE);
-        db.execSQL(CREATE_LOC_REVIEWS_TABLE);
-        db.execSQL(CREATE_USER_REVIEWS_TABLE);
         db.execSQL(CREATE_LOC_IMGS_TABLE);
         db.execSQL(CREATE_USER_LIST_TABLE);
     }
@@ -154,8 +142,6 @@ public class LocalDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEWS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOC_IMGS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOC_REVIEWS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_REVIEWS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_LIST);
             onCreate(db);
         }

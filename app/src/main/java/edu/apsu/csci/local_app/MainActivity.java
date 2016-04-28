@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Local"); // set the top title
 
+        LocalDatabaseHelper helper = LocalDatabaseHelper.getsInstance(this);
+
     }
 
     @Override
