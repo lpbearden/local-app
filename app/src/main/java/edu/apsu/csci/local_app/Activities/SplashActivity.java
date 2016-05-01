@@ -1,4 +1,4 @@
-package edu.apsu.csci.local_app;
+package edu.apsu.csci.local_app.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.concurrent.CountDownLatch;
+
+import edu.apsu.csci.local_app.R;
 
 /**
  * Created by PC on 4/21/2016.
