@@ -15,15 +15,14 @@ public class Locality {
     public String city;
     public String state;
     public String zip;
-    public ArrayList<String> img_paths;
-    public ArrayList<String> types;
+    public String [] img_paths;
+    public String [] types;
 
     public Locality () {
 
     }
 
-    public Locality (int id, String name, String description, String street, String city, String state, String zip, ArrayList<String> img_paths, ArrayList<String> types) {
-        this.id = id;
+    public Locality (String name, String description, String street, String city, String state, String zip, String [] img_paths, String [] types) {
         this.name = name;
         this.description = description;
         this.street = street;

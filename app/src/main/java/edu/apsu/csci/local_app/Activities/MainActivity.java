@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.apsu.csci.local_app.Adapters.LocalAdapter;
-import edu.apsu.csci.local_app.Adapters.LocalCursorAdapter;
-import edu.apsu.csci.local_app.Data.LocalDatabaseHelper;
+//import edu.apsu.csci.local_app.Adapters.LocalCursorAdapter;
+//import edu.apsu.csci.local_app.Data.LocalDatabaseHelper;
 import edu.apsu.csci.local_app.Models.Locality;
 import edu.apsu.csci.local_app.R;
 
@@ -30,42 +30,55 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Local"); // set the top title
 
-        LocalDatabaseHelper helper = LocalDatabaseHelper.getsInstance(this);
+        //LocalDatabaseHelper helper = LocalDatabaseHelper.getsInstance(this);
         ListView list_view = (ListView) findViewById(R.id.listView);
-
+        ArrayList<Locality> arrayOfLocalities = new ArrayList();
 
 
         //SAMPLE DATA
-        ArrayList<String> img_paths = new ArrayList<>();
-        img_paths.add("bpub_brewery1.jpg");
-        img_paths.add("bpub_brewery2.jpg");
+        String [] img_paths = new String[5];
+        img_paths[0] = "bpub_brewery1";
+        img_paths[1] = "bpub_brewery2";
 
-        ArrayList<String> types = new ArrayList<>();
-        types.add("bar");
-        types.add("restaurant");
+        String [] types = new String[5];
+        types[0] = "bar";
+        types[1] = "restaurant";
 
-        Locality sampleLocality = new Locality();
-        sampleLocality.name = "Blackhorse Pub & Brewery";
-        sampleLocality.description = "Local pub with great brews and pub fare!";
-        sampleLocality.street = "123 Somewhere Dr";
-        sampleLocality.city = "Clarksville";
-        sampleLocality.state = "TN";
-        sampleLocality.zip = "37040";
-        sampleLocality.img_paths = img_paths;
-        sampleLocality.types = types;
+        Locality sampleLocality = new Locality("Blackhorse Pub & Brewery", "Local pub with great brews and pub fare!", "123 Somewhere Dr.", "Clarksville", "TN", "37040", img_paths, types);
+        arrayOfLocalities.add(sampleLocality);
+
+        String [] img_paths1 = new String[5];
+        img_paths1[0] = "miss_lucilles";
+        img_paths1[1] = "miss_lucilles1";
+        img_paths1[2] = "miss_lucilles2";
+
+        String [] types1 = new String[5];
+        types1[0] = "shop";
+        types1[1] = "restaurant";
+
+        sampleLocality = new Locality("Miss Lucille's Marketplace", "Antiques & Thrift locally sourced in Clarksville, with a delicious cafe!", "123 Somewhere Dr.", "Clarksville", "TN", "37040", img_paths1, types1);
+        arrayOfLocalities.add(sampleLocality);
+
+        String [] img_paths2 = new String[5];
+        img_paths2[0] = "gilroy1";
+        img_paths2[1] = "gilroy2";
+        img_paths2[2] = "gilroy3";
 
 
-        Log.i("DATABASE", "BEFORE ADD OR UPDATE CALL");
-        helper.addOrUpdateLocality(sampleLocality);
-        Log.i("DATABASE", "AFTER ADD OR UPDATE CALL");
+        String [] types2 = new String[5];
+        types2[0] = "bar";
+        types2[1] = "restaurant";
 
+        sampleLocality = new Locality("The Gilroy Neighborhood Pub", "College bar with trivia every Thursday! Normal pub far.", "123 Somewhere Dr.", "Clarksville", "TN", "37040", img_paths2, types2);
+        arrayOfLocalities.add(sampleLocality);
 
-        //create adapter instance and set arrayList to the adapter
-        ArrayList<Locality> arrayOfLocalities = (ArrayList<Locality>)helper.getAllLocalities();
         LocalAdapter adapter = new LocalAdapter(this, arrayOfLocalities);
-
         list_view.setAdapter(adapter);
 
+
+        //helper.addOrUpdateLocality(sampleLocality);
+        //create adapter instance and set arrayList to the adapter
+        //ArrayList<Locality> arrayOfLocalities = (ArrayList<Locality>)helper.getAllLocalities();
     }
 
     @Override
