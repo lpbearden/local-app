@@ -15,13 +15,12 @@ public class User {
     public String profilePic_path;
     public ArrayList<Locality> user_list;
 
-    public User(int id, String username, String first_name, String last_name, String password, String profilePic_path, ArrayList<Locality> user_list) {
+    public User(int id, String username, String first_name, String last_name, String password, String profilePic_path) {
         this.id = id;
         this.username = username;
         this.first_name = first_name;
         this.last_name = last_name;
         this.password = password;
         this.profilePic_path = profilePic_path;
-        this.user_list = user_list;
     }
 }

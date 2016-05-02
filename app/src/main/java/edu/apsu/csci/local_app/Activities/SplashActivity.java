@@ -28,7 +28,7 @@ public class SplashActivity extends Activity {
             public void run() {
                 // Wait for the splash timeout.
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(4000);
                 } catch (InterruptedException e) { }
 
                 // Expire the splash page delay.
