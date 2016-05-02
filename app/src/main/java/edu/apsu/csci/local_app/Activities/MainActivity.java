@@ -2,27 +2,36 @@ package edu.apsu.csci.local_app.Activities;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +44,7 @@ import edu.apsu.csci.local_app.R;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<Locality> arrayOfLocalities = new ArrayList();
+    private User setUser = null;
     private User mainUser = new User(1, "lpbearden", "Lucas", "Bearden", "password", "test");
     private User testUser = new User(2, "janicholson", "John", "Nicholson", "password", "nicholson");
 
@@ -46,22 +56,46 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Local"); // set the top title
+        getSupportActionBar().setTitle("Localities"); // set the top title
+
+
+        final IProfile profile1 = new ProfileDrawerItem().withName("Max Muster").withEmail("max.mustermann@gmail.com").withIcon(R.drawable.test).withIdentifier(101);
+        final IProfile profile2 = new ProfileDrawerItem().withName("Felix House").withEmail("felix.house@gmail.com").withIcon(R.drawable.nicholson).withIdentifier(102);
+
+        // Create the AccountHeader
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .withTranslucentStatusBar(true)
+                .addProfiles(
+                        profile1,
+                        profile2
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
+
 
         new DrawerBuilder().withActivity(this).build();
         //if you want to update the items at a later time it is recommended to keep it in a variable
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withName(R.string.drawer_item_home);
-        PrimaryDrawerItem item2 = new SecondaryDrawerItem().withName(R.string.drawer_item_settings);
 
         //create the drawer and remember the `Drawer` result object
         Drawer result = new DrawerBuilder()
                 .withActivity(this)
+                .withSelectedItem(0)
+                .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         item1,
                         new DividerDrawerItem(),
-                        item2,
-                        new SecondaryDrawerItem().withName(R.string.drawer_item_settings)
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_search),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_cities),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_list)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -70,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build();
+
+        result.addStickyFooterItem(new PrimaryDrawerItem().withName(R.string.drawer_item_settings));
 
         //Set toolbar color in recent apps so logo doesn't blend in
         ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription("Local", BitmapFactory.decodeResource(getResources(), R.drawable.large_circle), Color.DKGRAY);
@@ -82,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         String [] img_paths = new String[5];
         img_paths[0] = "bpub_brewery1";
         img_paths[1] = "bpub_brewery2";
+        img_paths[2] = "bpub_brewery3";
 
         String [] types = new String[5];
         types[0] = "bar";
@@ -101,6 +138,20 @@ public class MainActivity extends AppCompatActivity {
         //set listView adapter
         list_view.setAdapter(adapter);
 
+
+
+
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Locality locality = arrayOfLocalities.get(position);
+                Log.i("LOCALITY NAME", "onItemClick: " + locality.getName());
+                Intent details = new Intent(MainActivity.this, ViewActivity.class);
+                details.putExtra("Location", locality);
+                startActivity(details);
+            }
+        });
+
         //region Database Stuff
         //LocalDatabaseHelper helper = LocalDatabaseHelper.getsInstance(this);
         //helper.addOrUpdateLocality(sampleLocality);
@@ -112,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 

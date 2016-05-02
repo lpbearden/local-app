@@ -1,5 +1,6 @@
 package edu.apsu.csci.local_app.Models;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Created by PC on 4/30/2016.
  */
-public class Locality {
+public class Locality implements Serializable {
     public int id;
     public String name;
     public String description;
@@ -36,5 +37,7 @@ public class Locality {
     public int getId() {
         return id;
     }
+
+    public String getName() { return name; }
 
 }
