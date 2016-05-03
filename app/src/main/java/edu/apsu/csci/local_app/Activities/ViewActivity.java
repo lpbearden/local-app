@@ -13,8 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -27,6 +32,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import edu.apsu.csci.local_app.Models.Locality;
+import edu.apsu.csci.local_app.Models.User;
 import edu.apsu.csci.local_app.R;
 
 /**
@@ -34,30 +40,33 @@ import edu.apsu.csci.local_app.R;
  */
 public class ViewActivity extends AppCompatActivity {
 
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
         Intent intent = getIntent();
-        Locality locality = (Locality)intent.getSerializableExtra("Location");
+        final Locality locality = (Locality) intent.getSerializableExtra("Location");
+        final User setUser = (User) intent.getSerializableExtra("User");
 
         Log.i("LOCALITY NAME", "onCreate: " + locality.getName());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(locality.getName());
 
-        final IProfile profile1 = new ProfileDrawerItem().withName("Max Muster").withEmail("max.mustermann@gmail.com").withIcon(R.drawable.test).withIdentifier(101);
-        final IProfile profile2 = new ProfileDrawerItem().withName("Felix House").withEmail("felix.house@gmail.com").withIcon(R.drawable.nicholson).withIdentifier(102);
+        final IProfile profile1 = new ProfileDrawerItem().withName("Lucas Bearden").withEmail("lpbearden@gmail.com").withIcon(R.drawable.test).withIdentifier(101);
 
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
+                .withSelectionListEnabledForSingleProfile(false)
                 .withHeaderBackground(R.drawable.header)
                 .withTranslucentStatusBar(true)
                 .addProfiles(
-                        profile1,
-                        profile2
+                        profile1
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -87,6 +96,27 @@ public class ViewActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (position == 1) {
+                            Intent details = new Intent(ViewActivity.this, MainActivity.class);
+                            startActivity(details);
+                        }
+                        else if (position == 3) {
+                            Toast toast = Toast.makeText(ViewActivity.this, "Senioritis got the better of us.", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else if (position == 4) {
+                            Toast toast = Toast.makeText(ViewActivity.this, "Senioritis again!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else if (position == 5) {
+                            Intent details = new Intent(ViewActivity.this, UserListActivity.class);
+                            details.putExtra("User", setUser);
+                            startActivity(details);
+                        }
+                        else if (position == 2) {
+                            Toast toast = Toast.makeText(ViewActivity.this, "This app has no settings.", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
                         return true;
                     }
                 })
@@ -97,8 +127,7 @@ public class ViewActivity extends AppCompatActivity {
 
         //Set toolbar color in recent apps so logo doesn't blend in
         ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription("Local", BitmapFactory.decodeResource(getResources(), R.drawable.large_circle), Color.DKGRAY);
-        ((Activity)this).setTaskDescription(taskDescription);
-
+        ((Activity) this).setTaskDescription(taskDescription);
 
 
         String imageResource1 = locality.img_paths[0];
@@ -108,18 +137,52 @@ public class ViewActivity extends AppCompatActivity {
         setImageView(imageResource2, 1);
         setImageView(imageResource3, 2);
 
+        TextView tv1 = (TextView) findViewById(R.id.textView);
+        TextView tv2 = (TextView) findViewById(R.id.textView2);
+        TextView tv3 = (TextView) findViewById(R.id.textView3);
+        TextView tv4 = (TextView) findViewById(R.id.textView4);
+        tv1.setText(locality.name);
+        tv2.setText(locality.street+ " " + locality.city + ", " + locality.state + " " + locality.zip);
+        tv3.setText(locality.description);
+        tv4.setText(locality.printTypes());
 
-
-
-
+        Button like_button = (Button) findViewById(R.id.like_button);
+        like_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO", "onItemClick: IN ON CLICK");
+                if (v.getId() == R.id.like_button) {
+                    if (setUser.user_list_count == 0) {
+                        setUser.user_list_count+=1;
+                        setUser.user_list[0] = locality;
+                        Toast toast = Toast.makeText(ViewActivity.this, "Added to your list.", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                    else {
+                        for (int i = 0; i < setUser.user_list_count; i++) {
+                            if (setUser.user_list[i].name.equals(locality.name)) {
+                                Toast toast = Toast.makeText(ViewActivity.this, "Locality is already in your list.", Toast.LENGTH_LONG);
+                                toast.show();
+                            } else {
+                                setUser.user_list_count+= 1;
+                                setUser.user_list[i] = locality;
+                                Toast toast = Toast.makeText(ViewActivity.this, "Added to your list.", Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void setImageView(String id, int index) {
         ImageView image_view1 = (ImageView) findViewById(R.id.image_view1);
         ImageView image_view2 = (ImageView) findViewById(R.id.image_view2);
         ImageView image_view3 = (ImageView) findViewById(R.id.image_view3);
-        ImageView [] image_views = {image_view1, image_view2, image_view3};
+        ImageView[] image_views = {image_view1, image_view2, image_view3};
         int resID = getResources().getIdentifier(id, "drawable", "edu.apsu.csci.local_app");
         image_views[index].setImageResource(resID);
     }
 }
+

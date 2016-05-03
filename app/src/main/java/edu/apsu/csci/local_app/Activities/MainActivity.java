@@ -17,9 +17,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -42,12 +46,11 @@ import edu.apsu.csci.local_app.Models.Locality;
 import edu.apsu.csci.local_app.Models.User;
 import edu.apsu.csci.local_app.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     private ArrayList<Locality> arrayOfLocalities = new ArrayList();
-    private User setUser = null;
-    private User mainUser = new User(1, "lpbearden", "Lucas", "Bearden", "password", "test");
-    private User testUser = new User(2, "janicholson", "John", "Nicholson", "password", "nicholson");
-
+    private User mainUser = new User(1, "lpbearden", "Lucas", "Bearden", "password", "lpbearden@gmail.com", "test");
+    private User testUser = new User(2, "janicholson", "John", "Nicholson", "password", "nicholsonja@apsu.edu", "nicholson");
+    public User setUser = mainUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,22 +62,21 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Localities"); // set the top title
 
 
-        final IProfile profile1 = new ProfileDrawerItem().withName("Max Muster").withEmail("max.mustermann@gmail.com").withIcon(R.drawable.test).withIdentifier(101);
-        final IProfile profile2 = new ProfileDrawerItem().withName("Felix House").withEmail("felix.house@gmail.com").withIcon(R.drawable.nicholson).withIdentifier(102);
+        final IProfile profile1 = new ProfileDrawerItem().withName("Lucas Bearden").withEmail("lpbearden@gmail.com").withIcon(R.drawable.test).withIdentifier(101);
 
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
+                .withSelectionListEnabledForSingleProfile(false)
                 .withHeaderBackground(R.drawable.header)
                 .withTranslucentStatusBar(true)
                 .addProfiles(
-                        profile1,
-                        profile2
+                        profile1
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        return false;
+                       return false;
                     }
                 })
                 .build();
@@ -100,10 +102,29 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (position == 3) {
+                            Toast toast = Toast.makeText(MainActivity.this, "Senioritis got the better of us.", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else if (position == 4) {
+                            Toast toast = Toast.makeText(MainActivity.this, "Senioritis again!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else if (position == 5) {
+                            Intent details = new Intent(MainActivity.this, UserListActivity.class);
+                            details.putExtra("User", setUser);
+                            startActivity(details);
+                        }
+                        else if (position == 2) {
+                            Toast toast = Toast.makeText(MainActivity.this, "This app has no settings.", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
                         return true;
                     }
                 })
                 .build();
+
+
 
         result.addStickyFooterItem(new PrimaryDrawerItem().withName(R.string.drawer_item_settings));
 
@@ -129,26 +150,30 @@ public class MainActivity extends AppCompatActivity {
 
         addLocality("Miss Lucille's Marketplace", "Antiques & Thrift locally sourced in Clarksville, with a delicious cafe!", "123 Somewhere Dr.", "Clarksville", "TN", "37040", "miss_lucilles", "miss_lucilles1", "miss_lucilles2", "restaurant", "shop");
         addLocality("The Gilroy Neighborhood Pub", "College bar with trivia every Thursday! Normal pub far.", "123 Somewhere Dr.", "Clarksville", "TN", "37040", "gilroy1", "gilroy2", "gilroy3", "restaurant", "bar");
+        addLocality("Section 125", "A great place to grab a beer and eat some wings.", "125 Franklin St.", "Clarksville", "TN", "37040", "section_125_1", "section_125_2", "section_125_3", "restaurant", "bar");
+        addLocality("Freeze Pleeze", "A local ice cream joint that makes homemade ice cream right in front of you with liquid nitrogen and fresh ingredients.", "652 N. Riverside Dr.", "Clarksville", "TN", "37040", "freeze_pleeze_1", "freeze_pleeze_2", "freeze_pleeze_3", "restaurants", "");
+        addLocality("Elite Wine and Spirits", "Just that.", "1875 Madison St.", "Clarksville, TN", "37040", "elite_1", "elite_2", "elite_3", "shops", "alcohol", "");
+        addLocality("Johnny’s Big Burger", "Best burger in town and you can’t beat a honey bun and ice cream.", "428 College St.", "Clarksville", "TN", "37040", "johnnys_1", "johnnys_2", "johnnys_3", "restaurants", "");
         //endregion
 
         //set ListView for localities up
-        ListView list_view = (ListView) findViewById(R.id.listView);
+        final ListView list_view = (ListView) findViewById(R.id.listView);
+
         //populate adapter with data
         LocalAdapter adapter = new LocalAdapter(this, arrayOfLocalities);
+
         //set listView adapter
         list_view.setAdapter(adapter);
 
-
-
-
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                Locality locality = arrayOfLocalities.get(position);
-                Log.i("LOCALITY NAME", "onItemClick: " + locality.getName());
-                Intent details = new Intent(MainActivity.this, ViewActivity.class);
-                details.putExtra("Location", locality);
-                startActivity(details);
+                                     int position, long id) {
+                    Locality locality = arrayOfLocalities.get(position);
+                    Log.i("LOCALITY NAME", "onItemClick: " + locality.getName());
+                    Intent details = new Intent(MainActivity.this, ViewActivity.class);
+                    details.putExtra("Location", locality);
+                    details.putExtra("User", setUser);
+                    startActivity(details);
             }
         });
 
@@ -194,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
         Locality sampleLocality = new Locality(name, description, street, city, state, zip, img_paths, types);
         arrayOfLocalities.add(sampleLocality);
     }
+
 
 
 }

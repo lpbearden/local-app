@@ -27,6 +27,10 @@
             android:name=".Activities.ViewActivity"
             android:label="ViewActivity">
         </activity>
+        <activity
+            android:name=".Activities.UserListActivity"
+            android:label="UserListActivity">
+        </activity>
 
     </application>
 </manifest>

@@ -5,18 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import java.util.ArrayList;
 
-import edu.apsu.csci.local_app.Activities.MainActivity;
 import edu.apsu.csci.local_app.Models.Locality;
 import edu.apsu.csci.local_app.Models.User;
 import edu.apsu.csci.local_app.R;
@@ -24,10 +20,10 @@ import edu.apsu.csci.local_app.R;
 /**
  * Created by PC on 4/30/2016.
  */
-public class LocalAdapter extends ArrayAdapter<Locality> {
+public class UserListAdapter extends ArrayAdapter<Locality> {
     private Context context;
 
-    public LocalAdapter(Context context, ArrayList<Locality> localities) {
+    public UserListAdapter(Context context, ArrayList<Locality> localities) {
         super(context, 0, localities);
         this.context = context;
     }
@@ -56,6 +52,7 @@ public class LocalAdapter extends ArrayAdapter<Locality> {
         tv_name.setText(locality.name);
         tv_description.setText(locality.description);
         image_view.setImageResource(resID);
+
 
 
         //return the completed view

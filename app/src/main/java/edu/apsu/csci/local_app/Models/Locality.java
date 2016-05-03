@@ -18,6 +18,8 @@ public class Locality implements Serializable {
     public String zip;
     public String [] img_paths;
     public String [] types;
+    public Review [] reviews;
+    public int reviewCount;
 
     public Locality () {
 
@@ -32,6 +34,8 @@ public class Locality implements Serializable {
         this.zip = zip;
         this.img_paths = img_paths;
         this.types = types;
+        this.reviewCount = 0;
+        this.reviews = new Review[10];
     }
 
     public int getId() {
@@ -39,5 +43,16 @@ public class Locality implements Serializable {
     }
 
     public String getName() { return name; }
+
+    public String printTypes() {
+        String typeString = types[0];
+        for (int i = 1; i < types.length; i++) {
+            if (types[i] == null)
+                break;
+            else
+                typeString += ", " + types[i];
+        }
+        return typeString;
+    }
 
 }
